@@ -29,6 +29,6 @@ Download it, and play it. It's not very long, and not very polished but it is sl
 
 ## Contributing
 
-I need to submit my own code, so there really isn't any opportunity to contribute, but I would appreciate and suggestions or feedback on how I could make it better though.
+I need to submit my own code, so there really isn't any opportunity to contribute, but I would appreciate any suggestions or feedback on how I could make it better though.
 
 I'm looking at state machines as a method to document and systemise processes. I'm also only at the beginning of the journey, so any help would be appreciated.

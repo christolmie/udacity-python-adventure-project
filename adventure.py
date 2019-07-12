@@ -29,7 +29,7 @@ class Option:
         self.optionDesc = optionDesc
         self.optionResp = optionResp
 
-def get_selector(self): return self.selector
+    def get_selector(self): return self.selector
 
 
 # The OptionList class has a list of options objects, and a list of valid
@@ -55,7 +55,8 @@ class OptionList:
         self.messages['bad_option'] = advmessages.Message(
                 "Sorry, that's not an option. Something else?"
                 )
-        self.messages['nothing_list'] = advmessages.Message('There are no options.')
+        self.messages['nothing_list'] =\
+            advmessages.Message('There are no options.')
 
         self.update_selector_list()
 
@@ -76,7 +77,9 @@ class OptionList:
         self.selectorList = []
         for option in self.optionList:
             if self.optionList[option].selector in self.selectorList:
-                print(f"WARNING - update_selector_list: Duplicate selector {option.selector}. Ignoring")
+                print(
+                    f"WARNING: Duplicate selector {option.selector}. Ignoring"
+                )
             else:
                 self.selectorList.append(self.optionList[option].selector)
 
@@ -121,9 +124,11 @@ class OptionList:
 
         if not self.is_nothing(messageKey):
             for option in self.optionList:
+                line = self.make_line_from_option(self.optionList[option])
                 self.messages[messageKey].msgLines.append(
-                        f"  {self.make_line_from_option(self.optionList[option])}"
+                        f"  {line}"
                         )
+
     def check_option_valid(self, inputOption):
         # Simple T/F check to see if the input string is in the list of options
         self.update_selector_list()
@@ -157,7 +162,6 @@ class OptionList:
         # Funtion to chose an option from the option list
         # These generates the option list message from the current optionList
         # and prints it to the screen.
-
 
         self.make_per_line_list('option_list', OPTION_DELAY)
         self.messages['option_list'].print_msg()
@@ -209,7 +213,6 @@ class Room:
         self.conditions = {}
         self.messages = {}
 
-
     def add_path(self, keyName, nextRoom):
         # Function to add a path link to a next room to the room path
         # lookup. The state maching needs the next location object to change
@@ -258,7 +261,6 @@ class Room:
         # The returned object is then used to handle actions within a room
         # to play out story messages and update player conditions.
 
-
         # Request input from the player
         selection = self.options.choose_option()
 
@@ -278,7 +280,6 @@ class Room:
             return self.handle_eat_tim_tam(player)
         else:
             return 'unmatched_action'
-
 
     def do_something_loop(self, player):
         # The do_something_loop() will loop over interactions with the
@@ -349,8 +350,6 @@ class Room:
         #
         # This can be overridden by rooms that do have conditions impacting
         # game movement.
-
-
         return self.do_something_loop(player)
 
     def next(self, nextRoomKey):
@@ -366,7 +365,6 @@ class Room:
         # In all cases, we return a room object up to the controling state
         # machine. This will either run the next room, or re-run the current
         # room.
-
 
         # Check if the nextRoomKey is in the paths dictionary. We need a
         # valid key to access the associated room object.
@@ -412,7 +410,6 @@ class Room:
         #
         # If self.run() receives a 'quit' message, it will be returned.
         # A 'quit' messages will break the main loop.
-
 
         self.arrive(player)
         self.on_arrival_handle_conditions(player)
@@ -463,11 +460,10 @@ class Field(Room):
     # Each of these conditions changes the messages that are sent to the
     # player
 
-
     def __init__(self):
         super().__init__()
-        self.messages=story_data.field_messages
-        self.conditions=story_data.field_conditions
+        self.messages = story_data.field_messages
+        self.conditions = story_data.field_conditions
 
     def build_options(self, player):
         self.options = OptionList()
@@ -479,37 +475,47 @@ class Field(Room):
                 advmessages.Message('You head over to the tree to lie down.')
             )
         )
+        message = 'You make your way into the forest. It is dark.'
         self.options.add(
             Option(
                 '2',
                 'field_cave',
                 'Head north into the forest.',
-                advmessages.Message('You make your way into the forest. It is dark.')
+                advmessages.Message(message)
             )
         )
         self.options_handle_troll_around(player)
+
+    def get_option_msg(self, dictKey, msgKey):
+        return self.messages[dictKey][msgKey].get_random_msg()
 
     def options_handle_troll_around(self, player):
         # Different options are available based on the player conditions.
         # This function changes which messages get played out based on those
         # conditions.
         if player.conditions['troll_around']:
-            cottageOptionDesc = \
-                    self.messages['optDesc']['random_troll_around']\
-                    .get_random_msg()
+            cottageOptionDesc = self.get_option_msg(
+                    'optDesc',
+                    'random_troll_around'
+                    )
 
             cottageOptionResp = advmessages.Message(
-                    self.messages['optResp']['random_troll_around']\
-                    .get_random_msg()
+                    self.get_option_msg(
+                        'optResp',
+                        'random_troll_around',
+                        )
                     )
         else:
-            cottageOptionDesc = \
-                    self.messages['optDesc']['random_troll_gone']\
-                    .get_random_msg()
+            cottageOptionDesc = self.get_option_msg(
+                    'optDesc',
+                    'random_troll_gone'
+                    )
 
             cottageOptionResp = advmessages.Message(
-                    self.messages['optResp']['random_troll_gone']\
-                    .get_random_msg()
+                    self.get_option_msg(
+                        'optResp',
+                        'random_troll_gone'
+                        )
                     )
 
         self.options.add(
@@ -533,7 +539,7 @@ class Field(Room):
     def interact(self, player):
         # Override the default function to handle having the sword
         # We use this to open the path to the cottage
-        if  player.conditions['has_sword']:
+        if player.conditions['has_sword']:
             self.handle_has_sword(player)
 
         if player.conditions['ate_tim_tam']:
@@ -549,8 +555,8 @@ class Cave(Room):
     # The only available path is back to the field.
     def __init__(self):
         super().__init__()
-        self.messages=story_data.cave_messages
-        self.conditions=story_data.cave_conditions
+        self.messages = story_data.cave_messages
+        self.conditions = story_data.cave_conditions
 
     def build_options(self, player):
         self.options = OptionList()
@@ -566,15 +572,17 @@ class Cave(Room):
 
     def options_handle_sword(self, player):
         if not player.conditions['has_sword']:
+            message = \
+                f'The {story_data.cave_weapon} feels warm in your hands.'
+
             self.options.add(
                     Option(
                         '2',
                         'get_sword',
                         f'Pick up the {story_data.cave_weapon}.',
-                        advmessages.Message(
-                            f'The {story_data.cave_weapon} feels warm in your hands.')
-                        )
+                        advmessages.Message(message)
                     )
+                )
 
 
 class Cottage(Room):
@@ -583,11 +591,10 @@ class Cottage(Room):
     #
     # From the cottage, we can go to the field or the kitchen.
 
-
     def __init__(self):
         super().__init__()
-        self.messages=story_data.cottage_messages
-        self.conditions=story_data.cottage_conditions
+        self.messages = story_data.cottage_messages
+        self.conditions = story_data.cottage_conditions
 
     def build_options(self, player):
         self.options = OptionList()
@@ -627,7 +634,6 @@ class Cottage(Room):
         #
         # Return 'no_path' to go into the do_something_loop.
 
-
         if player.conditions['has_sword']:
             player.conditions['troll_around'] = False
             self.conditions['paths']['cottage_kitchen']['path_open'] = True
@@ -640,7 +646,7 @@ class Cottage(Room):
             # We use the path link to the field object in self.paths
             # to set the path condition on the field object.
             self.paths['cottage_field']\
-                    .conditions['paths']['field_cottage']['path_open'] = False
+                .conditions['paths']['field_cottage']['path_open'] = False
             return 'cottage_field'
 
     def interact(self, player):
@@ -656,13 +662,14 @@ class Cottage(Room):
         # If we haven't gone somewhere else, do something here.
         return self.do_something_loop(player)
 
+
 class Kitchen(Room):
     # The kitchen has the tim tam, which is needed to open the path to the
     # quiet spot. The only path is back to the cottage.
     def __init__(self):
         super().__init__()
-        self.messages=story_data.kitchen_messages
-        self.conditions=story_data.kitchen_conditions
+        self.messages = story_data.kitchen_messages
+        self.conditions = story_data.kitchen_conditions
 
     def build_options(self, player):
         self.options = OptionList()
@@ -680,16 +687,18 @@ class Kitchen(Room):
 
     def options_handle_tim_tam(self, player):
         if not player.conditions['ate_tim_tam']:
+            message = \
+                'You tremble as you raise the last tim tam to your lips.'
+
             self.options.add(
                 Option(
                     '2',
                     'eat_tim_tam',
                     'Eat the last tim tam.',
-                    advmessages.Message(
-                        'You tremble as you raise the last tim tam to your lips.'
-                        )
+                    advmessages.Message(message)
                     )
                 )
+
 
 class Quiet_Spot(Room):
     # Getting to the quiet stop is the win condition. There are no options.
@@ -697,12 +706,13 @@ class Quiet_Spot(Room):
     # are done.
     def __init__(self):
         super().__init__()
-        self.messages=story_data.quietSpot_messages
-        self.conditions=story_data.quietSpot_conditions
+        self.messages = story_data.quietSpot_messages
+        self.conditionsi = story_data.quietSpot_conditions
 
     def interact(self, player):
         # If we make it here, we have completed the game
         return 'quit'
+
 
 class Player:
     def __init__(self):
@@ -783,7 +793,7 @@ class Adventure(Location):
 
     def play_again(self):
         while True:
-            quit = input('Again (y/n)?')
+            quit = input('\nAgain (y/n)?')
 
             if quit == 'y':
                 return True
@@ -814,6 +824,12 @@ class Adventure(Location):
             else:
                 return
 
+
+##########################################
+# Main functions
+##########################################
+
+
 def play_adventure():
     # Loop to initiate and play the game until the player quits
     play_on = True
@@ -826,9 +842,8 @@ def play_adventure():
 
 
 ##########################################
-# Main function
+# Main
 ##########################################
-#
 
 
 if __name__ == '__main__':

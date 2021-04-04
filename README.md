@@ -1,4 +1,4 @@
-# Pixel Art Maker Project
+# Python Adventure Project
 
 ## Table of Contents
 
